@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Allow: /browse
+Allow: /items/
+Disallow: /dashboard
+Disallow: /pay/
+Disallow: /api/
+
+Sitemap: https://artbid.manus.space/sitemap.xml
