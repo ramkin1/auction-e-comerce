@@ -79,3 +79,11 @@
 - [x] User ban/unban functionality with reasons
 - [x] Moderation reports table and workflow
 - [x] Payment refund operations
+
+
+## Seed Data (New)
+- [x] Create seed script with 15-20 artwork/antique listings
+- [x] Generate/fetch artwork images from public sources
+- [x] Upload images to S3 and get CDN URLs
+- [x] Insert listings into database with realistic prices and descriptions (20 items: 3 artwork, 3 furniture, 2 collectible sculptures, 3 jewelry, 4 collectible/antique, 5 mixed)
+- [x] Verify all listings appear on Browse page
