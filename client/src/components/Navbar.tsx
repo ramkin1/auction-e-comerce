@@ -83,6 +83,16 @@ export function Navbar() {
                   <DropdownMenuItem asChild>
                     <Link href="/sell">List an Item</Link>
                   </DropdownMenuItem>
+                  {user?.role === "admin" && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link href="/admin" className="text-primary font-semibold">
+                          Admin Panel
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={() => logout.mutate()}

@@ -8,6 +8,7 @@ import { documentsRouter } from "./routers/documents";
 import { itemsRouter } from "./routers/items";
 import { paymentsRouter } from "./routers/payments";
 import { watchlistRouter } from "./routers/watchlist";
+import { adminRouter } from "./routers/admin";
 
 export const appRouter = router({
   system: systemRouter,
@@ -27,6 +28,7 @@ export const appRouter = router({
   chatbot: chatbotRouter,
   documents: documentsRouter,
   watchlist: watchlistRouter,
+  admin: adminRouter,
 });
 
 export type AppRouter = typeof appRouter;

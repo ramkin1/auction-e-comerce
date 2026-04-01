@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import Sell from "./pages/Sell";
 import Pay from "./pages/Pay";
 import Orders from "./pages/Orders";
+import Admin from "./pages/Admin";
 
 function Router() {
   return (
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/items/:id" component={ItemDetail} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/orders" component={Orders} />
+      <Route path="/admin" component={Admin} />
       <Route path="/sell" component={Sell} />
       <Route path="/pay/:itemId" component={Pay} />
       <Route path="/404" component={NotFound} />

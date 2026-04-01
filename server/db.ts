@@ -461,3 +461,249 @@ export async function getWatchersForItem(itemId: number) {
     .leftJoin(users, eq(watchlist.userId, users.id))
     .where(eq(watchlist.itemId, itemId));
 }
+
+
+// ─── Admin Queries ────────────────────────────────────────────────────────────
+
+export async function getAllItems(limit = 50, offset = 0) {
+  const db = await getDb();
+  if (!db) return { items: [], total: 0 };
+
+  const [rows, countResult] = await Promise.all([
+    db
+      .select({
+        id: items.id,
+        title: items.title,
+        category: items.category,
+        currentPrice: items.currentPrice,
+        status: items.status,
+        bidCount: items.bidCount,
+        endTime: items.endTime,
+        createdAt: items.createdAt,
+        sellerName: users.name,
+        sellerId: items.sellerId,
+      })
+      .from(items)
+      .leftJoin(users, eq(items.sellerId, users.id))
+      .orderBy(desc(items.createdAt))
+      .limit(limit)
+      .offset(offset),
+    db.select({ count: sql<number>`count(*)` }).from(items),
+  ]);
+
+  return { items: rows, total: Number(countResult[0]?.count ?? 0) };
+}
+
+export async function getAllUsers(limit = 50, offset = 0) {
+  const db = await getDb();
+  if (!db) return { users: [], total: 0 };
+
+  const [rows, countResult] = await Promise.all([
+    db
+      .select()
+      .from(users)
+      .orderBy(desc(users.createdAt))
+      .limit(limit)
+      .offset(offset),
+    db.select({ count: sql<number>`count(*)` }).from(users),
+  ]);
+
+  return { users: rows, total: Number(countResult[0]?.count ?? 0) };
+}
+
+export async function getAllPayments(limit = 50, offset = 0) {
+  const db = await getDb();
+  if (!db) return { payments: [], total: 0 };
+
+  const [rows, countResult] = await Promise.all([
+    db
+      .select({
+        id: payments.id,
+        userId: payments.userId,
+        itemId: payments.itemId,
+        amount: payments.amount,
+        status: payments.status,
+        mpesaCode: payments.mpesaCode,
+        createdAt: payments.createdAt,
+        userName: users.name,
+        itemTitle: items.title,
+      })
+      .from(payments)
+      .leftJoin(users, eq(payments.userId, users.id))
+      .leftJoin(items, eq(payments.itemId, items.id))
+      .orderBy(desc(payments.createdAt))
+      .limit(limit)
+      .offset(offset),
+    db.select({ count: sql<number>`count(*)` }).from(payments),
+  ]);
+
+  return { payments: rows, total: Number(countResult[0]?.count ?? 0) };
+}
+
+export async function getAdminAnalytics() {
+  const db = await getDb();
+  if (!db) return null;
+
+  const now = Date.now();
+
+  const [
+    totalItems,
+    activeItems,
+    totalUsers,
+    totalBids,
+    completedPayments,
+    totalRevenue,
+    topItems,
+  ] = await Promise.all([
+    db.select({ count: sql<number>`count(*)` }).from(items),
+    db
+      .select({ count: sql<number>`count(*)` })
+      .from(items)
+      .where(and(eq(items.status, "active"), gt(items.endTime, now))),
+    db.select({ count: sql<number>`count(*)` }).from(users),
+    db.select({ count: sql<number>`count(*)` }).from(bids),
+    db
+      .select({ count: sql<number>`count(*)` })
+      .from(payments)
+      .where(eq(payments.status, "completed")),
+    db
+      .select({ total: sql<number>`SUM(CAST(${payments.amount} AS UNSIGNED))` })
+      .from(payments)
+      .where(eq(payments.status, "completed")),
+    db
+      .select({
+        id: items.id,
+        title: items.title,
+        bidCount: items.bidCount,
+        currentPrice: items.currentPrice,
+      })
+      .from(items)
+      .orderBy(desc(items.bidCount))
+      .limit(5),
+  ]);
+
+  return {
+    totalItems: Number(totalItems[0]?.count ?? 0),
+    activeItems: Number(activeItems[0]?.count ?? 0),
+    totalUsers: Number(totalUsers[0]?.count ?? 0),
+    totalBids: Number(totalBids[0]?.count ?? 0),
+    completedPayments: Number(completedPayments[0]?.count ?? 0),
+    totalRevenue: Number(totalRevenue[0]?.total ?? 0),
+    topItems,
+  };
+}
+
+export async function updateUserRole(userId: number, role: "user" | "admin") {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  await db.update(users).set({ role }).where(eq(users.id, userId));
+}
+
+export async function updatePaymentStatus(
+  paymentId: number,
+  status: "pending" | "completed" | "failed"
+) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  await db
+    .update(payments)
+    .set({ status, updatedAt: new Date() })
+    .where(eq(payments.id, paymentId));
+}
+
+// ─── Admin Settings ───────────────────────────────────────────────────────────
+
+export async function getAdminSetting(key: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db
+    .select()
+    .from(adminSettings)
+    .where(eq(adminSettings.key, key))
+    .limit(1);
+  return result[0];
+}
+
+export async function setAdminSetting(key: string, value: string) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  await db
+    .insert(adminSettings)
+    .values({ key, value })
+    .onDuplicateKeyUpdate({ set: { value } });
+}
+
+export async function getAllAdminSettings() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(adminSettings);
+}
+
+// ─── User Bans ────────────────────────────────────────────────────────────────
+
+export async function banUser(userId: number, reason: string) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  await db
+    .update(users)
+    .set({ isBanned: "true", banReason: reason })
+    .where(eq(users.id, userId));
+}
+
+export async function unbanUser(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  await db
+    .update(users)
+    .set({ isBanned: "false", banReason: null })
+    .where(eq(users.id, userId));
+}
+
+// ─── Moderation ───────────────────────────────────────────────────────────────
+
+export async function createModerationReport(data: InsertModeration) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  await db.insert(moderation).values(data);
+}
+
+export async function getModerationReports(
+  status?: "pending" | "reviewed" | "resolved" | "dismissed",
+  limit = 50,
+  offset = 0
+) {
+  const db = await getDb();
+  if (!db) return { reports: [], total: 0 };
+
+  const conditions = status ? [eq(moderation.status, status)] : [];
+  const where = conditions.length > 0 ? and(...conditions) : undefined;
+
+  const [rows, countResult] = await Promise.all([
+    db
+      .select()
+      .from(moderation)
+      .where(where)
+      .orderBy(desc(moderation.createdAt))
+      .limit(limit)
+      .offset(offset),
+    db.select({ count: sql<number>`count(*)` }).from(moderation).where(where),
+  ]);
+
+  return { reports: rows, total: Number(countResult[0]?.count ?? 0) };
+}
+
+export async function updateModerationStatus(
+  reportId: number,
+  status: "pending" | "reviewed" | "resolved" | "dismissed",
+  adminNotes?: string
+) {
+  const db = await getDb();
+  if (!db) throw new Error("DB unavailable");
+  await db
+    .update(moderation)
+    .set({ status, adminNotes, updatedAt: new Date() })
+    .where(eq(moderation.id, reportId));
+}
+
+// Import the new types
+import { adminSettings, moderation, InsertModeration } from "../drizzle/schema";

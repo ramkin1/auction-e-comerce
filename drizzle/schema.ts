@@ -16,6 +16,8 @@ export const users = mysqlTable("users", {
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+  isBanned: mysqlEnum("isBanned", ["false", "true"]).default("false").notNull(),
+  banReason: text("banReason"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -98,3 +100,28 @@ export const documents = mysqlTable("documents", {
 
 export type Document = typeof documents.$inferSelect;
 export type InsertDocument = typeof documents.$inferInsert;
+
+export const adminSettings = mysqlTable("adminSettings", {
+  id: int("id").autoincrement().primaryKey(),
+  key: varchar("key", { length: 128 }).notNull().unique(),
+  value: text("value").notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AdminSetting = typeof adminSettings.$inferSelect;
+export type InsertAdminSetting = typeof adminSettings.$inferInsert;
+
+export const moderation = mysqlTable("moderation", {
+  id: int("id").autoincrement().primaryKey(),
+  type: mysqlEnum("type", ["item", "document", "user_report"]).notNull(),
+  targetId: int("targetId").notNull(), // item/document/user id
+  reason: text("reason").notNull(),
+  reportedBy: int("reportedBy"),
+  status: mysqlEnum("status", ["pending", "reviewed", "resolved", "dismissed"]).default("pending").notNull(),
+  adminNotes: text("adminNotes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Moderation = typeof moderation.$inferSelect;
+export type InsertModeration = typeof moderation.$inferInsert;

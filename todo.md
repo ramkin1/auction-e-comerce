@@ -63,3 +63,19 @@
 - [x] bids router tests
 - [x] payments router tests
 - [x] chatbot router tests
+
+
+## Admin Panel (New)
+- [x] Admin router: getAllItems, getAllUsers, getAllPayments, getAnalytics, updateItemStatus, updateUserRole, updatePaymentStatus, moderationReports
+- [x] Admin listing management page (view all, end auction, delete)
+- [x] Admin user management page (view users, promote/demote admin, ban/unban)
+- [x] Admin payment management page (view all payments, mark completed, refund)
+- [x] Admin analytics dashboard (total auctions, revenue, active users, bid volume, top items)
+- [x] Admin moderation page (moderation reports with status tracking)
+- [x] Admin settings page (persistent auction rules, fees, image size)
+- [x] Admin route protection (only admin users can access)
+- [x] Admin navigation in Navbar
+- [x] Persistent admin settings storage (DB table + CRUD)
+- [x] User ban/unban functionality with reasons
+- [x] Moderation reports table and workflow
+- [x] Payment refund operations

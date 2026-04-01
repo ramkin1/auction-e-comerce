@@ -15,6 +15,13 @@
       "when": 1775026974709,
       "tag": "0001_right_bucky",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1775029877197,
+      "tag": "0002_unusual_professor_monster",
+      "breakpoints": true
     }
   ]
 }
