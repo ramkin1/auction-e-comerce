@@ -8,11 +8,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Gavel, Menu, User, X } from "lucide-react";
+import { Gavel, Menu, Moon, Sun, User, X } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { useTheme } from "@/contexts/ThemeContext";
 
 const NAV_LINKS = [
   { href: "/browse", label: "Browse" },
@@ -23,6 +24,7 @@ const NAV_LINKS = [
 
 export function Navbar() {
   const { user, isAuthenticated } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [location] = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const logout = trpc.auth.logout.useMutation({
@@ -38,11 +40,11 @@ export function Navbar() {
         <div className="flex items-center justify-between h-14">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 no-underline">
-            <div className="w-7 h-7 bg-primary flex items-center justify-center">
+            <div className="w-7 h-7 bg-primary rounded flex items-center justify-center">
               <Gavel className="h-4 w-4 text-primary-foreground" />
             </div>
             <span className="font-black text-lg tracking-tight text-foreground">
-              ART<span className="text-primary">BID</span>
+              AIR<span className="text-primary">BID</span>
             </span>
           </Link>
 
@@ -63,8 +65,21 @@ export function Navbar() {
             ))}
           </nav>
 
-          {/* Auth */}
+          {/* Theme toggle + Auth */}
           <div className="hidden md:flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleTheme}
+              className="border border-foreground/20"
+              title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+            >
+              {theme === 'light' ? (
+                <Moon className="h-4 w-4" />
+              ) : (
+                <Sun className="h-4 w-4" />
+              )}
+            </Button>
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

@@ -23,19 +23,19 @@ export default function Home() {
             {/* Left: copy */}
             <div className="lg:col-span-7 flex flex-col justify-center py-16 lg:pr-16 lg:border-r border-foreground/10">
               <div className="flex items-center gap-3 mb-8">
-                <div className="w-8 h-8 bg-primary" aria-hidden />
+                <div className="w-8 h-8 bg-primary rounded" aria-hidden />
                 <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                  Kenya's Premier Art Auction
+                  Kenya's Premier Auction Platform
                 </span>
               </div>
               <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black leading-[0.9] tracking-tight mb-8 text-foreground">
-                BID ON<br />
-                <span className="text-primary">RARE</span><br />
-                ARTWORKS
+                DISCOVER<br />
+                <span className="text-primary">EXTRAORDINARY</span><br />
+                TREASURES
               </h1>
               <p className="text-base text-muted-foreground max-w-md mb-10 leading-relaxed">
-                Discover authenticated artwork and antiques. Place bids in real-time,
-                pay securely via M-Pesa, and own a piece of history.
+                Bid on authenticated artwork, antiques, and collectibles. Secure M-Pesa payments,
+                real-time bidding, and expert verification on every item.
               </p>
               <div className="flex flex-wrap gap-3">
                 <Button

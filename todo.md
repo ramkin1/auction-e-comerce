@@ -87,3 +87,14 @@
 - [x] Upload images to S3 and get CDN URLs
 - [x] Insert listings into database with realistic prices and descriptions (20 items: 3 artwork, 3 furniture, 2 collectible sculptures, 3 jewelry, 4 collectible/antique, 5 mixed)
 - [x] Verify all listings appear on Browse page
+
+
+## Rebranding to AirBid (New)
+- [x] Update app name and branding (AirBid)
+- [x] Update CSS design tokens: purple/white light theme, dark gray/purple dark mode
+- [x] Update logo (rounded purple square with gavel)
+- [x] Update meta tags and SEO titles
+- [x] Update navbar and hero copy
+- [x] Add theme toggle button (Moon/Sun icons) in Navbar
+- [x] Enable switchable theme (light/dark) with working toggle
+- [x] All tests passing (20/20), TypeScript clean
